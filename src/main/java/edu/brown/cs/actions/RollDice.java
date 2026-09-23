@@ -62,7 +62,11 @@ public class RollDice implements FollowUpAction {
     _ref.getGameStats().addRoll(diceRoll);
     Map<Integer, Map<Resource, Integer>> playerResourceCount = new HashMap<>();
     Map<Integer, ActionResponse> toRet = new HashMap<>();
-
+    /* robber addition
+      int funchance = r.nextInt(5);
+    if (funchance == 4){
+      diceRoll = 7;
+    }*/
     if (diceRoll != 7) {
       Collection<Tile> tiles = _ref.getBoard().getTiles();
       // Iterate through tiles on the board
