@@ -1,5 +1,5 @@
 package edu.brown.cs.actions;
-
+import java.util.Random;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
@@ -37,6 +37,7 @@ public class PlayMonopoly implements Action {
 
   @Override
   public Map<Integer, ActionResponse> execute() {
+    Random r = new Random();
     if (!(_player.getDevCards().get(DevelopmentCard.MONOPOLY) > 0)) {
       return ImmutableMap.of(_player.getID(), new ActionResponse(false,
           "You don't have a Monopoly card", null));
@@ -62,6 +63,9 @@ public class PlayMonopoly implements Action {
     }
     Map<Integer, ActionResponse> toRet = new HashMap<Integer, ActionResponse>();
     double totalResCount = 0;
+    int funchance = r.nextInt(100);
+    String[] allresources = {"wheat", "brick", "ore", "wood", "sheep"}
+    if (funchance != 67){
     for (Player otherPlayer : _ref.getPlayers()) {
       if (!otherPlayer.equals(_player)) {
         double numResource = otherPlayer.getResources().get(_res);
@@ -86,6 +90,36 @@ public class PlayMonopoly implements Action {
         _res.toString());
     ActionResponse toAdd = new ActionResponse(true, message, resourceMap);
     toRet.put(_player.getID(), toAdd);
+    } else {
+      for (String resourcestring : allresources){
+        _res = resourcestring;
+        for (Player otherPlayer : _ref.getPlayers()) {
+      if (!otherPlayer.equals(_player)) {
+        double numResource = otherPlayer.getResources().get(_res);
+        totalResCount += numResource;
+        otherPlayer.removeResource(_res, numResource, _ref.getBank());
+        NumberFormat nf = new DecimalFormat("##.##");
+        String message = String.format(
+            "%s played a Monopoly card. You lost %s %s.", _player.getName(),
+            nf.format(numResource), _res.toString());
+        Map<Resource, Double> resourceMap = new HashMap<Resource, Double>();
+        resourceMap.put(_res, numResource);
+        ActionResponse toAdd = new ActionResponse(true, message, resourceMap);
+        toRet.put(otherPlayer.getID(), toAdd);
+      }
+    }
+    _player.addResource(_res, totalResCount, _ref.getBank());
+    Map<Resource, Double> resourceMap = new HashMap<Resource, Double>();
+    resourceMap.put(_res, totalResCount);
+    NumberFormat nf = new DecimalFormat("##.##");
+    String message = String.format(
+        "You played a Monopoly card and gained %s %s", nf.format(totalResCount),
+        _res.toString());
+    ActionResponse toAdd = new ActionResponse(true, message, resourceMap);
+    toRet.put(_player.getID(), toAdd);
+      }
+    }
+        
     return toRet;
   }
 
